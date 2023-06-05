@@ -1,0 +1,30 @@
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import wordnet
+from nltk.metrics.distance import edit_distance
+
+# Download NLTK resources (if not already downloaded)
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('words')
+
+def heal_tokens(text):
+    tokens = word_tokenize(text)
+    healed_tokens = []
+
+    for token in tokens:
+        if not wordnet.synsets(token):
+            candidates = [word for word in wordnet.words() if abs(len(word) - len(token)) <= 2]
+            corrected_token = min(candidates, key=lambda word: edit_distance(token, word))
+            healed_tokens.append(corrected_token)
+        else:
+            healed_tokens.append(token)
+
+    healed_text = ' '.join(healed_tokens)
+    return healed_text
+
+# Test the token healing function
+input_text = "Ths quck brwn fox jmps ovr the lzy dog."
+healed_text = heal_tokens(input_text)
+print("Input Text:", input_text)
+print("Healed Text:", healed_text)
